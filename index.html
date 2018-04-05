@@ -1,0 +1,146 @@
+<html>
+	<head>
+		<script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	</head>
+  <body class>
+    <a-scene></canvas>
+	<a-camera position="-0.5 2 0" rotation="0.343774677078458 1.0313240312355372 0" camera="" look-controls="" wasd-controls="" data-aframe-inspector-original-camera="">
+	  <a-cursor color="#FF0000" material="" raycaster="" cursor="" geometry="">
+	</a-cursor></a-camera>
+      <a-cylinder position="-0.675 2.385 -5.866" radius="0.5" height="1.5" color="#FFC65D" material="" geometry="primitive:ring;thetaLength:90;thetaStart:180" id="yellow" class="pad"></a-cylinder><a-cylinder position="-0.506 2.535 -5.921" radius="0.5" height="1.5" color="#FFC65D" material="color:#970004" geometry="primitive:circle;radius:0.3" id="start"></a-cylinder><a-cylinder position="-0.696 2.68 -5.878" radius="0.5" height="1.5" color="#FFC65D" material="color:#38e100" geometry="primitive:ring;thetaLength:90;thetaStart:90" id="green" class="pad"></a-cylinder><a-cylinder position="-0.325 2.677 -5.854" radius="0.5" height="1.5" color="#FFC65D" material="color:#d50000" geometry="primitive:ring;thetaLength:90" id="red" class="pad"></a-cylinder><a-cylinder position="-0.289 2.37 -5.935" radius="0.5" height="1.5" color="#FFC65D" material="color:#0c01d3" geometry="primitive:ring;thetaLength:90;thetaStart:270" id="blue" class="pad"></a-cylinder>
+      <a-plane position="-0.254 -0.02 -4.003" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" material="" geometry=""></a-plane>
+      <a-sky color="#ECECEC" position="0.302 0 0" material="" geometry=""></a-sky>
+	  <a-entity text="value:0" position="2.861 2.672 -1.765" scale="5 5 1" id="display"></a-entity>
+    </a-scene>
+  
+	
+		    <script>
+			//variables
+			userSeq = [];
+			simonSeq = [];
+			const NUM_OF_LEVELS = 3;
+			var id,color,level = 0;
+			
+			var start = document.querySelector('#start')
+			start.addEventListener("click", function(){
+			level = 1;
+			startSequence();
+			});
+			
+			//user pad
+			var pad = document.getElementsByClassName("pad");
+			Array.from(pad).forEach(function(element) {
+			  element.addEventListener('mouseenter', function( ){
+			  element.setAttribute('material', 'color', 'white');
+			  var color = $(this).attr("id");
+			  if(color == "green"){
+			  var id = 1;
+			  } else if (color == "red"){
+			  var id = 2;
+			  } else if (color == "blue"){
+			  var id = 3;
+			  } else{
+			  var id = 0;
+			  } 
+			  userSeq.push(id);
+			  console.log(userSeq)
+			  //check user sequence
+			  if(!checkUserSeq()){
+				displayError();
+				userSeq = [];
+			  }
+			  //checking end of sequence
+			  if(userSeq.length == simonSeq.length){
+				level++;
+				userSeq = [];
+				startSequence();
+			  }
+			  });
+			  element.addEventListener('mouseleave', function( ){
+			  var Cparam = $(this).attr("id");
+			  var cID = document.querySelector('#'+ Cparam)
+			  setDefault(cID,Cparam);
+			  });
+			});	
+			
+			//check user sequence against CPU
+			function checkUserSeq(){
+				for(var i =0; i < userSeq.length; i++){
+					if(userSeq[i] != simonSeq[i]){
+					return false;
+					}
+				}
+				return true;
+			}
+			
+			//display Error
+			function displayError(){
+			console.log("error");
+			var counter = 0;
+			var myError = setInterval(function(){
+				var display = document.querySelector('#display')
+					display.setAttribute('text', {value:"Error"});
+					counter++;
+			if (counter == 3) {
+				display.setAttribute('text', {value:level});
+				clearInterval(myError);
+				userSeq = [];
+				counter = 0;
+				}
+			}, 500);
+			}
+			
+			//once start is pushed
+			function startSequence(){
+				console.log(level);
+				var display = document.querySelector('#display')
+				display.setAttribute('text', {value:level});
+				getRandomNumber();
+				var i = 0;
+				var Interval = setInterval(function() {
+					id = simonSeq[i];
+					if(id == 1){
+					var cID = document.querySelector('#green')
+					var Cparam = "green"
+					} else if (id == 2) {
+					var cID = document.querySelector('#red')
+					var Cparam = "red"
+					} else if (id == 3) {
+					var cID = document.querySelector('#blue')
+					var Cparam = "blue"
+					} else {
+					var cID = document.querySelector('#yellow')
+					var Cparam = "yellow"
+					}
+					cID.setAttribute('material', 'color', 'white');
+					setDefault(cID,Cparam);
+					i++;
+					if(i ==  simonSeq.length){
+					clearInterval(Interval);
+					}
+				}, 1000);
+			}
+			
+			function getRandomNumber(){
+			var random = Math.floor(Math.random() * 4);
+			simonSeq.push(random);
+			}
+			
+			function setDefault(cID,Cparam){
+			playSound()
+			setTimeout(function(){
+			cID.setAttribute('material', 'color', Cparam);
+			}, 500);
+		}
+			
+			function playSound(){
+			var audio = new Audio('beep-02.mp3');
+			audio.volume = 0.1;
+			audio.play();
+			}
+			
+		</script>
+	
+	</body>
+</html>

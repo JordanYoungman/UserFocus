@@ -27,7 +27,10 @@
 			var start = document.querySelector('#start')
 			start.addEventListener("click", function(){
 			level = 1;
+			simonSeq = [];
 			startSequence();
+			start.setAttribute('material', 'color', 'white')
+			setInterval(function(){ start.setAttribute('material', 'color', '#970004') }, 500);
 			});
 			
 			//user pad
